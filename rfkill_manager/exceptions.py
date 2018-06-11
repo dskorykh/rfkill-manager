@@ -1,0 +1,2 @@
+class RfkillError(Exception):
+    pass
