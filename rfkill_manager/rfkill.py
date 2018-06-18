@@ -100,3 +100,11 @@ def _prepare_event_struct(idx, event):
         event_struct = event_struct.decode("ascii")
 
     return event_struct
+
+
+def rfkill_execute_event_by_type(type, event):
+    """event block or unblock"""
+    rfks = rfkill_list()
+    for name in rfks:
+        if rfks[name]['type'] == type:
+            rfkill_execute_soft_event(rfks[name]['idx'], event)
