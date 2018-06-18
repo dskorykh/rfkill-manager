@@ -20,6 +20,7 @@ def rfkill_list():
     except IOError:
         logger.exception("rfkill is not available via udev")
     else:
+        logger.info("rfkill list values: {}".format(rfkill_dict))
         return rfkill_dict
 
 
@@ -88,6 +89,7 @@ def rfkill_execute_soft_event(idx, event):
     try:
         with open(constants.UDEV_RFKILL_PATH, 'w') as f:
             f.write(event_struct)
+            logger.info("Event '{}' for {} index received".format(event, idx))
     except IOError:
         logger.exception("Available properties: 'name', 'type', 'soft', 'hard'. Please, choose one of them")
 
@@ -105,6 +107,7 @@ def _prepare_event_struct(idx, event):
 def rfkill_execute_event_by_type(type, event):
     """event block or unblock"""
     rfks = rfkill_list()
+    logger.info("Event '{}' for {} type received".format(event, type))
     for name in rfks:
         if rfks[name]['type'] == type:
             rfkill_execute_soft_event(rfks[name]['idx'], event)
