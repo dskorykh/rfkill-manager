@@ -76,3 +76,27 @@ def _check_rfkill_device_on_existance(idx):
     if not os.path.exists(os.path.join(constants.SYSFS_RFKILL_PATH, "rfkill{}".format(idx))):
         raise exceptions.RfkillError("Device at {} rfkill index does not exist".format(idx))
 
+
+def rfkill_event(idx, rtype, op, hard=0, soft=0):
+    return struct.pack(constants.EVENT_FORMAT, idx, rtype, op, hard, soft)
+
+
+def rfkill_execute_soft_event(idx, event):
+    """event block or unblock"""
+    _check_rfkill_device_on_existance(idx)
+    event_struct = _prepare_event_struct(idx, event)
+    try:
+        with open(constants.UDEV_RFKILL_PATH, 'w') as f:
+            f.write(event_struct)
+    except IOError:
+        logger.exception("Available properties: 'name', 'type', 'soft', 'hard'. Please, choose one of them")
+
+
+def _prepare_event_struct(idx, event):
+    action = constants.RFKILL_STATE[constants.RFKILL_EVENT_ACTIONS[event]]
+    event_struct = rfkill_event(idx, constants.RFKILL_TYPE_ALL, constants.RFKILL_OP_CHANGE, action, 0)
+
+    if is_python3():
+        event_struct = event_struct.decode("ascii")
+
+    return event_struct
