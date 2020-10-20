@@ -1,5 +1,4 @@
 import rfkill_manager
-import sys
 from pprint import pprint
 
 
